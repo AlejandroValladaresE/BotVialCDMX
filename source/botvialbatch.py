@@ -45,7 +45,6 @@ def main():
         list_volcadura = json.loads(os.environ.get('volcadura'))
         list_accidente = json.loads(os.environ.get('lista_accidente'))
         list_exclusiones = json.loads(os.environ.get('exclusion'))
-        dict_alcaldia = json.loads(os.environ.get('alcaldias'))
         fecha = obten_fecha()
         logging.info(fecha + " "  + nombre_modulo + " "+ "Inicia Botvial.py")
         try:

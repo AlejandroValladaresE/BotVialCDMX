@@ -21,6 +21,7 @@ import pytz
 import tzlocal
 from datetime import datetime
 
+from clasificadores.alcaldia import identifica_alcaldia
 
 nombre_modulo = "analizador.py"
 
@@ -30,7 +31,7 @@ nombre_modulo = "analizador.py"
 # se descartan: Retweets, respuestas a eventos válidos o eventos en Zona Metropolitana de VDM
 # Argumentos:
 #    analiza_evento(status,lista_fallecido,lista_peaton,lista_bicis,lista_moto,lista_atropellado,lista_volcadura,dict_alcaldia,lista_accidente,lista_exclusiones)     
-def analiza_evento(tweet,list_fall,list_peat,list_bic,list_moto,list_atrop,list_volc,dict_alcal,list_accidente,list_exclusion):
+def analiza_evento(tweet,list_fall,list_peat,list_bic,list_moto,list_atrop,list_volc,list_accidente,list_exclusion):
 
     list_fallecimiento = list_fall
     list_peaton = list_peat
@@ -38,7 +39,6 @@ def analiza_evento(tweet,list_fall,list_peat,list_bic,list_moto,list_atrop,list_
     list_motociclista = list_moto
     list_atropellado = list_atrop
     list_volcadura = list_volc
-    dict_alcaldias = dict_alcal
     lista_exclusiones = list_exclusion
     lista_accidente = list_accidente 
     file_name = 'Documentos/EntornoBot/files/logcdmx'   
@@ -56,15 +56,14 @@ def analiza_evento(tweet,list_fall,list_peat,list_bic,list_moto,list_atrop,list_
         estado = 0
     else:
         # se buscan de manera detallada el tipo de evento, si se encuentra, la funcion busca_evento
-        # o la función identifica_alcaldia regresan 1, si no, 0.
-        fallecimiento = busca_evento(list_fallecimiento, cadena_limpia) 
+        fallecimiento = busca_evento(list_fallecimiento, cadena_limpia)
         peaton = busca_evento(list_peaton,cadena_limpia)
         motociclista = busca_evento(list_motociclista,cadena_limpia)
         ciclista = busca_evento(list_bicicleta,cadena_limpia)        
         atropellado = busca_evento(list_atropellado,cadena_limpia)
         volcadura = busca_evento(list_volcadura,cadena_limpia)
         accidente = busca_evento(lista_accidente,cadena_limpia)
-        alcaldia =identifica_alcaldia(dict_alcaldias,cadena_limpia)
+        alcaldia = identifica_alcaldia(cadena_limpia)
         
         if volcadura or atropellado or fallecimiento or accidente:
             # se descartan los fallecimientos no relacionados con eventos viales
@@ -90,7 +89,7 @@ def analiza_evento(tweet,list_fall,list_peat,list_bic,list_moto,list_atrop,list_
                 resultado.append(motociclista)           #[10]
                 resultado.append(peaton)                 #[11]
                 resultado.append(accidente)              #[12]
-                resultado.append(alcaldia)               #[13]
+                resultado.append(alcaldia.value)         #[13]
                 file_name += fecha_hora[0:10] + ".csv"
                 estado = guarda_evento(resultado,file_name)
                 if estado == 1:
@@ -141,23 +140,7 @@ def limpia_texto(texto):
         texto_limpio = texto_limpio.replace(char," ") 
     return texto_limpio
         
-
-
-# Función para identificar si dentro del texto del tuit se reconoce la alcaldia
-# donde se genero el evento, caso contrario, se retorna cadena vacia.
-
-def identifica_alcaldia(dicccionario,texto):
-    alcaldia = ""
-    for clave,valor in dicccionario.items():
-        if re.search(clave,texto):
-            alcaldia = clave            
-            break
-        if re.search(valor,texto):
-            alcaldia = clave
-            break
-    return alcaldia
-
-#función para almacenar el evento identificado  en el log de eventos    
+#función para almacenar el evento identificado  en el log de eventos
 def guarda_evento(evento,file):
     respuesta = 0
     fecha = obten_fecha()
@@ -182,10 +165,3 @@ def convierte_utc_localtime(fecha_utc):
     except:
         print("Error al convertir fecha.")
         return str(fecha_utc)
-
-
-        
-
- 
-   
-
