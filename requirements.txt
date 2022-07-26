@@ -1,9 +1,11 @@
 certifi==2022.5.18.1
+coverage==6.4.2
 charset-normalizer==2.0.12
 emoji==1.7.0
 idna==3.3
 oauthlib==3.2.0
 python-dotenv==0.20.0
+pytest==7.1.2
 pytz==2022.1
 pytz-deprecation-shim==0.1.0.post0
 requests==2.27.1
